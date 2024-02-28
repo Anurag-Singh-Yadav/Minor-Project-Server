@@ -5,6 +5,10 @@ const studentSchema = new Schema({
   name: {
     type: String,
   },
+  branchCode:{
+    type: String,
+    required: true,
+  },
   isFree: {
     type: Boolean,
     default: false,
@@ -16,10 +20,6 @@ const studentSchema = new Schema({
   },
   gpa: {
     type: Number,
-    required: true,
-  },
-  branchCode: {
-    type: String,
     required: true,
   },
   de: {

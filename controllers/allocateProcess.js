@@ -1,9 +1,8 @@
 const courseSchema = require("../models/courseSchema");
 const studentSchema = require("../models/studentSchema")
+const mongoose = require("mongoose");
 
-exports.allocateDepartmentElectives = async (req , res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+exports.allocateDepartmentElectives = async (req , res, next) => {
     try{
 
         const allStudents = await studentSchema.find({});
@@ -13,7 +12,9 @@ exports.allocateDepartmentElectives = async (req , res) => {
         for(let i = 0 ; i < allStudents.length ; i++){
             const {branchCode , rollNo , dePreference , isFree , de} = allStudents[i];
 
-            if(!isFree || de == 0){
+            console.log('Alloting Department elective to rollNo ---> ' , rollNo);
+
+            if(!isFree){
                 continue;
             }
 
@@ -33,21 +34,16 @@ exports.allocateDepartmentElectives = async (req , res) => {
 
                 if(courseDetails.deAllotted.length < courseDetails.internal){
                     courseDetails.deAllotted.push(rollNo);
-                    await courseDetails.save({session});
-                    allStudents[i].de--;
-                    allStudents[i].deAllotted.push(courseCode);
-                    await allStudents[i].save({session});
-                    if(allStudents[i].de == 0)break;
+                    await courseDetails.save();
+                    allStudents[i].deAllotted.push(dePreference[j]);
+                    await allStudents[i].save();
+                    if(allStudents[i].deAllotted.length >= allStudents[i].de)break;
                 }
             }
         }
-
-        await session.commitTransaction();
-        session.endSession();
+        next();
 
     } catch (e) {
-        await session.abortTransaction();
-        session.endSession();
         console.error(e);
         res.status(500).json({
             success:false,
@@ -58,16 +54,15 @@ exports.allocateDepartmentElectives = async (req , res) => {
 }
 
 exports.allocateOpenElectives = async (req , res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try{
-
         const allStudents = await studentSchema.find({});
 
         allStudents.sort((a , b) => b.gpa - a.gpa);
 
         for(let i = 0 ; i < allStudents.length ; i++){
             const {branchCode , rollNo , oePreference , isFree , oeAllotted , oe} = allStudents[i];
+
+            console.log('Alloting Open elective to rollNo ---> ' , rollNo);
 
             if(!isFree || oeAllotted.length >= oe){
                 continue;
@@ -76,18 +71,21 @@ exports.allocateOpenElectives = async (req , res) => {
             for(let j = 0 ; j < oePreference.length ; j++){
                 const courseDetails = await courseSchema.findOne({
                     courseCode : oePreference[j],
-                    branchCode : branchCode,
                 });
 
                 if(!courseDetails){
-                    throw new Error('Course not found!! Please match preference array with course details');
+                    console.log('Error causing ---> ' , oePreference[j]);
+                    return res.status(500).json({
+                        success:false,
+                        message: 'Course not found',
+                    })
                 }
 
                 if(courseDetails.oeAllotted.length < courseDetails.total - courseDetails.internal){
                     courseDetails.oeAllotted.push(rollNo);
-                    await courseDetails.save({session});
-                    allStudents[i].oeAllotted.push(courseDetails.courseCode);
-                    await allStudents[i].save({session});
+                    await courseDetails.save();
+                    allStudents[i].oeAllotted.push(oePreference[j]);
+                    await allStudents[i].save();
                     if(allStudents[i].oeAllotted.length === allStudents[i].oe){
                         break;
                     }
@@ -95,18 +93,12 @@ exports.allocateOpenElectives = async (req , res) => {
             }
         }
 
-        await session.commitTransaction();
-        session.endSession();
-
-
         return res.status(200).json({
             success:true,
             message:'Open electives allotted successfully.',
         })
 
     } catch (e) {
-        await session.abortTransaction();
-        session.endSession();
         console.error(e);
         res.status(500).json({
             success:false,
@@ -117,25 +109,20 @@ exports.allocateOpenElectives = async (req , res) => {
 }
 
 exports.clearDEAllottment = async (req , res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try{
         const allCourses = await courseSchema.find({});
 
         for(let i = 0 ; i < allCourses.length ; i++){
             allCourses[i].deAllotted = [];
-            await allCourses[i].save({session});
+            await allCourses[i].save();
         }
 
         const allStudents = await studentSchema.find({});
 
         for(let i = 0 ; i < allStudents.length ; i++){
             allStudents[i].deAllotted = [];
-            await allStudents[i].save({session});
+            await allStudents[i].save();
         }
-
-        await session.commitTransaction();
-        session.endSession();
 
         return res.status(200).json({
             success:true,
@@ -143,8 +130,6 @@ exports.clearDEAllottment = async (req , res) => {
         })
 
     } catch (e) {
-        await session.abortTransaction();
-        session.endSession();
         console.error(e);
         res.status(500).json({
             success:false,
@@ -155,25 +140,20 @@ exports.clearDEAllottment = async (req , res) => {
 }
 
 exports.clearOEAllottment = async (req , res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try{
         const allCourses = await courseSchema.find({});
 
         for(let i = 0 ; i < allCourses.length ; i++){
             allCourses[i].oeAllotted = [];
-            await allCourses[i].save({session});
+            await allCourses[i].save();
         }
 
         const allStudents = await studentSchema.find({});
 
         for(let i = 0 ; i < allStudents.length ; i++){
             allStudents[i].oeAllotted = [];
-            await allStudents[i].save({session});
+            await allStudents[i].save();
         }
-
-        await session.commitTransaction();
-        session.endSession();
 
         return res.status(200).json({
             success:true,
@@ -181,8 +161,6 @@ exports.clearOEAllottment = async (req , res) => {
         })
 
     } catch (e) {
-        await session.abortTransaction();
-        session.endSession();
         console.error(e);
         res.status(500).json({
             success:false,
@@ -193,15 +171,13 @@ exports.clearOEAllottment = async (req , res) => {
 }
 
 exports.clearAllotments = async (req , res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
     try{
         const allCourses = await courseSchema.find({});
 
         for(let i = 0 ; i < allCourses.length ; i++){
             allCourses[i].deAllotted = [];
             allCourses[i].oeAllotted = [];
-            await allCourses[i].save({session});
+            await allCourses[i].save();
         }
 
         const allStudents = await studentSchema.find({});
@@ -209,11 +185,8 @@ exports.clearAllotments = async (req , res) => {
         for(let i = 0 ; i < allStudents.length ; i++){
             allStudents[i].deAllotted = [];
             allStudents[i].oeAllotted = [];
-            await allStudents[i].save({session});
+            await allStudents[i].save();
         }
-
-        await session.commitTransaction();
-        session.endSession();
 
         return res.status(200).json({
             success:true,
@@ -221,8 +194,6 @@ exports.clearAllotments = async (req , res) => {
         })
 
     } catch (e) {
-        await session.abortTransaction();
-        session.endSession();
         console.error(e);
         res.status(500).json({
             success:false,

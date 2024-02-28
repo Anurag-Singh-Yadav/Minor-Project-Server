@@ -10,7 +10,7 @@ const branchSchema = new Schema({
     required: true,
   },
   branchCode: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },

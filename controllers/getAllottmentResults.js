@@ -44,7 +44,17 @@ exports.getAllCourses = async (req, res) => {
 exports.getCourseWiseAllottment = async (req, res) => {
   const { courseCode } = req.body;
   try {
-    const course = await courseSchema.find({ courseCode });
+    console.log(courseCode);
+    const course = await courseSchema.findOne({ courseCode });
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    console.log(course);
 
     const oeAllotted = [];
     const deAllotted = [];
@@ -53,21 +63,33 @@ exports.getCourseWiseAllottment = async (req, res) => {
       const student = await studentSchema.findOne({
         rollNo: course.deAllotted[i],
       });
-      deAllotted.push(student);
+      deAllotted.push({
+        rollNo: student.rollNo,
+        name: student.name,
+        branchCode: student.branchCode,
+      });
     }
 
-    for (let i = 0; i < oeAllotted.length; i++) {
+    for (let i = 0; i < course.oeAllotted.length; i++) {
       const student = await studentSchema.findOne({
         rollNo: course.oeAllotted[i],
       });
-      oeAllotted.push(student);
+      oeAllotted.push({
+        rollNo: student.rollNo,
+        name: student.name,
+        branchCode: student.branchCode,
+      });
     }
 
     return res.status(200).json({
       success: true,
       message: "Allottment results fetched successfully",
       data: {
-        ...course.toObject(),
+        course: course.courseCode,
+        totalSeats: course.total,
+        departmentAllotted: course.deAllotted.length,
+        openElectiveAllotted: course.oeAllotted.length,
+        totalSeatsAllotted: course.deAllotted.length + course.deAllotted.length,
         deAllotted,
         oeAllotted,
       },
@@ -92,14 +114,13 @@ exports.getAllottmentBranchWise = async (req, res) => {
   try {
     const students = await studentSchema.find({ branchCode });
 
-    students.sort((a , b) => a.rollNo < b.rollNo);
+    students.sort((a, b) => a.rollNo < b.rollNo);
 
     return res.status(200).json({
-        success:true,
-        message:'All students fetched successfully',
-        data:students,
+      success: true,
+      message: "All students fetched successfully",
+      data: students,
     });
-
   } catch (err) {
     console.error(err);
     return res.status(500).json({
