@@ -5,6 +5,10 @@ const studentSchema = new Schema({
   name: {
     type: String,
   },
+  isFree: {
+    type: Boolean,
+    default: false,
+  },
   rollNo: {
     type: Number,
     required: true,
@@ -22,12 +26,14 @@ const studentSchema = new Schema({
     type: Number,
     required: true,
   },
-  ge: {
+  oe: {
     type: Number,
     required: true,
   },
   dePreference: { type: [String] },
-  gePreference: { type: [String] },
+  oePreference: { type: [String] },
+  deAllotted: { type: [String] },
+  oeAllotted: { type: [String] },
 });
 
 module.exports = mongoose.model("Students", studentSchema);

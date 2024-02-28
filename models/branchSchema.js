@@ -5,21 +5,14 @@ const branchSchema = new Schema({
   branchName: {
     type: String,
   },
-  branchStrength:{
-    type:Number,
+  branchStrength: {
+    type: Number,
+    required: true,
   },
   branchCode: {
     type: Number,
     required: true,
     unique: true,
-  },
-  gpa: {
-    type: Number,
-    required: true,
-  },
-  branch: {
-    type: String,
-    required: true,
   },
 });
 
