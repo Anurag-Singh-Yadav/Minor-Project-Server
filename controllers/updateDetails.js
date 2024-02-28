@@ -1,4 +1,8 @@
+const branchSchema = require("../models/branchSchema");
+const courseSchema = require("../models/courseSchema");
 const studentSchema = require("../models/studentSchema");
+const mongoose = require("mongoose");
+
 
 exports.overWriteStudentDetails = async (req, res) => {
   const { studentDetails } = req.data;
@@ -96,6 +100,8 @@ exports.overWriteBranchDetails = async (req, res) => {
     await session.abortTransaction();
     session.endSession();
 
+    console.log(err);
+
     return res.status(500).json({
       success: false,
       message: "Error occured while overwriting branch details",
@@ -174,31 +180,30 @@ exports.addStudents = async (req, res) => {
   session.startTransaction();
 
   try {
-    const students = students.map(
+    const studentsData = students.map(
       ({
         branch,
         gpa,
         name,
         de,
-        ge,
+        oe,
         isFree,
         rollNo,
         oePreference,
         dePreference,
       }) => ({
-        branch,
+        branchCode:branch,
         gpa,
         name,
         de,
-        ge,
+        oe,
         isFree,
         rollNo,
         oePreference,
         dePreference,
       })
     );
-
-    await studentSchema.insertMany(students, { session });
+    await studentSchema.insertMany(studentsData, { session });
     await session.commitTransaction();
     session.endSession();
 
@@ -209,7 +214,7 @@ exports.addStudents = async (req, res) => {
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-
+    console.log(err.message);
     return res.status(500).json({
       success: false,
       message: "Error occured while adding student details",
