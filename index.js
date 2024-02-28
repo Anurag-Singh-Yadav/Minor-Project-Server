@@ -7,7 +7,6 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
-
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
@@ -17,8 +16,6 @@ const BASE_URL = process.env.BASE_URL || '/';
 const PORT = process.env.PORT || 7000 ;
 
 require('./config/database').dbConnect();
-
-
 
 app.use((err, req, res, next) => {
     console.error(err.stack);
