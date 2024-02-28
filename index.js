@@ -25,6 +25,10 @@ app.use((err, req, res, next) => {
     res.status(500).send('Something went wrong!');
 });
 
+app.use('/get-results' , require('./routers/getResults'));
+
+app.use('/update-details' , require('./routers/updates'));
+
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });

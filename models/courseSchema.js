@@ -6,13 +6,13 @@ const courseSchema = new Schema({
     type: String,
   },
   courseCode: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },
   branchCode: {
     type: String,
-    required: true,
+    // required: true,
   },
   internal: {
     type: Number,
@@ -22,13 +22,11 @@ const courseSchema = new Schema({
     type: Number,
     required: true,
   },
-  deAlloted:{
+  deAllotted:{
     type: [Number],
-    required: true,
   },
-  oeAlloted:{
+  oeAllotted:{
     type: [Number],
-    required: true,
   },
 });
 
