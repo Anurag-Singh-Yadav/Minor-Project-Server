@@ -2,6 +2,7 @@ const courseSchema = require("../models/courseSchema");
 const studentSchema = require("../models/studentSchema")
 const mongoose = require("mongoose");
 
+
 exports.allocateDepartmentElectives = async (req , res, next) => {
     try{
 
@@ -12,9 +13,9 @@ exports.allocateDepartmentElectives = async (req , res, next) => {
         for(let i = 0 ; i < allStudents.length ; i++){
             const {branchCode , rollNo , dePreference , isFree , de} = allStudents[i];
 
-            console.log('Alloting Department elective to rollNo ---> ' , rollNo);
+            console.log(`Alloting Department elective to ${i}/${allStudents.length} rollNo ---> ` , rollNo);
 
-            if(!isFree){
+            if(!isFree || de === 0){
                 continue;
             }
 
@@ -62,9 +63,10 @@ exports.allocateOpenElectives = async (req , res) => {
         for(let i = 0 ; i < allStudents.length ; i++){
             const {branchCode , rollNo , oePreference , isFree , oeAllotted , oe} = allStudents[i];
 
-            console.log('Alloting Open elective to rollNo ---> ' , rollNo);
+            console.log(`Alloting Open elective to ${i}/${allStudents.length} rollNo ---> ` , rollNo);
 
-            if(!isFree || oeAllotted.length >= oe){
+
+            if(!isFree || oe == 0){
                 continue;
             }
 
@@ -81,7 +83,7 @@ exports.allocateOpenElectives = async (req , res) => {
                     })
                 }
 
-                if(courseDetails.oeAllotted.length < courseDetails.total - courseDetails.internal){
+                if(courseDetails.oeAllotted.length < courseDetails.total - courseDetails.deAllotted.length){
                     courseDetails.oeAllotted.push(rollNo);
                     await courseDetails.save();
                     allStudents[i].oeAllotted.push(oePreference[j]);
@@ -172,21 +174,20 @@ exports.clearOEAllottment = async (req , res) => {
 
 exports.clearAllotments = async (req , res) => {
     try{
-        const allCourses = await courseSchema.find({});
+        
+        await courseSchema.updateMany({}, {
+            $set: {
+                oeAllotted: [],
+                deAllotted: []
+            }
+        });
 
-        for(let i = 0 ; i < allCourses.length ; i++){
-            allCourses[i].deAllotted = [];
-            allCourses[i].oeAllotted = [];
-            await allCourses[i].save();
-        }
-
-        const allStudents = await studentSchema.find({});
-
-        for(let i = 0 ; i < allStudents.length ; i++){
-            allStudents[i].deAllotted = [];
-            allStudents[i].oeAllotted = [];
-            await allStudents[i].save();
-        }
+        await studentSchema.updateMany({}, {
+            $set: {
+                oeAllotted: [],
+                deAllotted: []
+            }
+        })
 
         return res.status(200).json({
             success:true,
