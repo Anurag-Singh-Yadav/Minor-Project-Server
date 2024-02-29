@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 
 
 exports.overWriteStudentDetails = async (req, res) => {
-  const { studentDetails } = req.data;
+  const { studentDetails } = req.body;
 
   if (!studentDetails) {
     return res.status(404).json({
@@ -19,24 +19,23 @@ exports.overWriteStudentDetails = async (req, res) => {
 
   try {
     await studentSchema.deleteMany({}, { session });
-
     const students = studentDetails.map(
       ({
-        branch,
+        branchCode,
         gpa,
         name,
         de,
-        ge,
+        oe,
         isFree,
         rollNo,
         oePreference,
         dePreference,
       }) => ({
-        branch,
+        branchCode,
         gpa,
         name,
         de,
-        ge,
+        oe,
         isFree,
         rollNo,
         oePreference,
