@@ -63,7 +63,7 @@ exports.allocateOpenElectives = async (req , res) => {
         for(let i = 0 ; i < allStudents.length ; i++){
             const {branchCode , rollNo , oePreference , isFree , oeAllotted , oe} = allStudents[i];
 
-            console.log(`Alloting Department elective to ${i}/${allStudents.length} rollNo ---> ` , rollNo);
+            console.log(`Alloting Open elective to ${i}/${allStudents.length} rollNo ---> ` , rollNo);
 
 
             if(!isFree || oe == 0){
