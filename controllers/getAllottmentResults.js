@@ -2,6 +2,11 @@ const branchSchema = require("../models/branchSchema");
 const courseSchema = require("../models/courseSchema");
 const studentSchema = require("../models/studentSchema");
 
+function padNumber(num) {
+  let str = num.toString();
+  return str.padStart(6, "0");
+}
+
 exports.getAllBranches = async (req, res) => {
   try {
     const allBranches = await branchSchema.find({});
@@ -53,7 +58,6 @@ exports.getCourseWiseAllottment = async (req, res) => {
       });
     }
 
-
     const oeAllotted = [];
     const deAllotted = [];
 
@@ -62,9 +66,9 @@ exports.getCourseWiseAllottment = async (req, res) => {
         rollNo: course.deAllotted[i],
       });
       deAllotted.push({
-        rollNo: student.rollNo,
-        name: student.name,
-        branchCode: student.branchCode,
+        Roll_No: padNumber(student.rollNo),
+        Name: student.name,
+        Branch_Code: student.branchCode,
       });
     }
 
@@ -73,9 +77,9 @@ exports.getCourseWiseAllottment = async (req, res) => {
         rollNo: course.oeAllotted[i],
       });
       oeAllotted.push({
-        rollNo: student.rollNo,
-        name: student.name,
-        branchCode: student.branchCode,
+        Roll_No: padNumber(student.rollNo),
+        Name: student.name,
+        Branch_Code: student.branchCode,
       });
     }
 
@@ -114,10 +118,22 @@ exports.getAllottmentBranchWise = async (req, res) => {
 
     students.sort((a, b) => a.rollNo < b.rollNo);
 
+    const data = [];
+
+    for (let i = 0; i < students.length; i++) {
+      const { rollNo, name, deAllotted, oeAllotted } = students[i];
+      data.push({
+        Roll: rollNo,
+        Name: name,
+        Department_Allotted: deAllotted.join(" "),
+        Open_Elective_Allotted: oeAllotted.join(" "),
+      });
+    }
+
     return res.status(200).json({
       success: true,
       message: "All students fetched successfully",
-      data: students,
+      data,
     });
   } catch (err) {
     console.error(err);
