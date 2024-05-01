@@ -144,3 +144,23 @@ exports.getAllottmentBranchWise = async (req, res) => {
     });
   }
 };
+
+
+exports.getEveryCourse = async (req , res) => {
+  try {
+    const allCourses = await courseSchema.find({});
+
+    return res.status(200).json({
+      success: true,
+      message: "All courses fetched successfully.",
+      data: allCourses,
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "An error occurred while fetching courses.",
+      error: err,
+    });
+  }
+}
