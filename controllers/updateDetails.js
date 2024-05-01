@@ -3,7 +3,6 @@ const courseSchema = require("../models/courseSchema");
 const studentSchema = require("../models/studentSchema");
 const mongoose = require("mongoose");
 
-
 exports.overWriteStudentDetails = async (req, res) => {
   const { studentDetails } = req.body;
 
@@ -65,7 +64,7 @@ exports.overWriteStudentDetails = async (req, res) => {
 
 exports.overWriteBranchDetails = async (req, res) => {
   const { branchDetails } = req.body;
-
+  console.log("branchDetails", branchDetails);
   if (!branchDetails) {
     return res.status(404).json({
       success: false,
@@ -165,8 +164,75 @@ exports.overWriteCourseDetails = async (req, res) => {
   }
 };
 
+function generateRandomGPA() {
+  return (Math.random() * (10.0 - 5.5) + 5.5).toFixed(2);
+}
+
+function generateRandomMarks() {
+  return Math.floor(Math.random() * (2 - 1 + 1)) + 1;
+}
+
+function generateOEPreference(branchCode) {
+  const otherBranches = [
+    "CS",
+    "IT",
+    "ECE",
+    "EE",
+    "ME",
+    "CE",
+    "CHE",
+    "BT",
+    "TE",
+    "IPE",
+    "ICE",
+  ].filter((branch) => branch !== branchCode);
+  const subjects = otherBranches.map(
+    (otherBranch) => `${otherBranch}${"10"}${Math.floor(Math.random() * 3) + 1}`
+  );
+  return subjects;
+}
+
+function generateDEPreference(branchCode) {
+  return [`${branchCode}101`, `${branchCode}102`, `${branchCode}103`];
+}
+
+function getStudents() {
+  const studentData = [];
+  let j = 1;
+  const branches = [
+    "CS",
+    "IT",
+    "EC",
+    "EE",
+    "ME",
+    "CE",
+    "CH",
+    "BT",
+    "TT",
+    "IP",
+    "IC",
+  ];
+  for (const branch of branches) {
+    for (let i = 1; i <= 10; i++) {
+      const student = {
+        name: `${branch} Student${i}`,
+        rollNo: j,
+        branchCode: branch,
+        gpa: generateRandomGPA(),
+        oe: generateRandomMarks(),
+        de: generateRandomMarks(),
+        dePreference: generateDEPreference(branch),
+        oePreference: generateOEPreference(branch),
+      };
+      j++;
+      studentData.push(student);
+    }
+  }
+  return studentData;
+}
+
 exports.addStudents = async (req, res) => {
-  const { students } = req.body;
+  const students = getStudents();
 
   if (!students) {
     return res.status(404).json({
@@ -181,7 +247,7 @@ exports.addStudents = async (req, res) => {
   try {
     const studentsData = students.map(
       ({
-        branch,
+        branchCode,
         gpa,
         name,
         de,
@@ -191,7 +257,7 @@ exports.addStudents = async (req, res) => {
         oePreference,
         dePreference,
       }) => ({
-        branchCode:branch,
+        branchCode: branchCode,
         gpa,
         name,
         de,
@@ -224,14 +290,13 @@ exports.addStudents = async (req, res) => {
 
 exports.addBranch = async (req, res) => {
   const { branch } = req.body;
-
+  console.log("branch", branch);
   if (!branch) {
     return res.status(404).json({
       success: false,
       message: "Branch details not found",
     });
   }
-
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -243,7 +308,6 @@ exports.addBranch = async (req, res) => {
         branchStrength,
       })
     );
-
     await branchSchema.insertMany(branches, { session });
     await session.commitTransaction();
     session.endSession();
@@ -279,13 +343,7 @@ exports.addCourse = async (req, res) => {
 
   try {
     const courses = course.map(
-      ({
-        branchCode,
-        courseCode,
-        courseTitle,
-        internal,
-        total,
-      }) => ({
+      ({ branchCode, courseCode, courseTitle, internal, total }) => ({
         branchCode,
         courseCode,
         courseTitle,
