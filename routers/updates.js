@@ -13,7 +13,8 @@ const {
   clearDEAllottment,
   clearOEAllottment,
   clearAllotments,
-  fixxx,
+  allotDE,
+  allotOE,
 } = require("../controllers/allocateProcess");
 
 const router = express.Router();
@@ -31,5 +32,7 @@ router.post("/add-branch", addBranch);
 router.post("/allocate-electives", allocateDepartmentElectives , allocateOpenElectives);
 router.post('/clear-department-allottment' , clearDEAllottment);
 router.post('/clear-open-electives', clearOEAllottment);
-router.post('/clear-all-allotments' , clearAllotments);
+router.post('/clear-all-allottments' , clearAllotments);
+router.post('/de-allottment' , allotDE);
+router.post('/oe-allottment' , allotOE);
 module.exports = router;

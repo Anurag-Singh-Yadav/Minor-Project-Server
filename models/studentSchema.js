@@ -11,7 +11,7 @@ const studentSchema = new Schema({
   },
   isFree: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   rollNo: {
     type: Number,
