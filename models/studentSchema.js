@@ -21,6 +21,7 @@ const studentSchema = new Schema({
   gpa: {
     type: Number,
     required: true,
+    indexedDB: true,
   },
   de: {
     type: Number,
