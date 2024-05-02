@@ -1,8 +1,8 @@
 const branchSchema = require("../models/branchSchema");
 const courseSchema = require("../models/courseSchema");
+const studentBackgroundInfo = require("../models/studentBackgroundInfo");
 const studentSchema = require("../models/studentSchema");
 const mongoose = require("mongoose");
-
 
 exports.overWriteStudentDetails = async (req, res) => {
   const { studentDetails } = req.body;
@@ -191,7 +191,7 @@ exports.addStudents = async (req, res) => {
         oePreference,
         dePreference,
       }) => ({
-        branchCode:branch,
+        branchCode: branch,
         gpa,
         name,
         de,
@@ -279,13 +279,7 @@ exports.addCourse = async (req, res) => {
 
   try {
     const courses = course.map(
-      ({
-        branchCode,
-        courseCode,
-        courseTitle,
-        internal,
-        total,
-      }) => ({
+      ({ branchCode, courseCode, courseTitle, internal, total }) => ({
         branchCode,
         courseCode,
         courseTitle,
@@ -311,5 +305,44 @@ exports.addCourse = async (req, res) => {
       message: "Error occured while adding course details",
       error: err,
     });
+  }
+};
+
+function randomDE() {
+  return Math.floor(Math.random() * 3);
+}
+
+exports.oneTime = async (req, res) => {
+  try {
+    const students = await studentSchema.find({});
+
+    const studentData = students.map((student) => {
+      const de = randomDE();
+      const oe = 2 - de;
+      return {
+        branchCode: student.branchCode,
+        gpa: student.gpa,
+        name: student.name,
+        rollNo: student.rollNo,
+        semester: 7,
+        de,
+        oe,
+      };
+    });
+    await studentSchema.deleteMany({});
+
+    await studentBackgroundInfo.insertMany(studentData);
+
+    return res.status(200).json({
+      success:true,
+      studentData,
+      message:'Students Data Uploaded Successfully',
+    });
+  } catch (err) {
+    console.log(err);
+    return restatus(500).json({
+      success:false,
+      message: 'Error occured while uploading student data'
+    })
   }
 };

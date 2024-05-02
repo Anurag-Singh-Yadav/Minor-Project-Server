@@ -6,6 +6,7 @@ const {
   addStudents,
   addCourse,
   addBranch,
+  oneTime,
 } = require("../controllers/updateDetails");
 const {
   allocateDepartmentElectives,
@@ -27,6 +28,7 @@ router.post("/overwrite-course-details", overWriteCourseDetails);
 router.post("/add-students", addStudents);
 router.post("/add-courses", addCourse);
 router.post("/add-branch", addBranch);
+router.post('/one-time' , oneTime);
 
 // allocation process
 router.post("/allocate-electives", allocateDepartmentElectives , allocateOpenElectives);

@@ -2,6 +2,16 @@ const courseSchema = require("../models/courseSchema");
 const studentSchema = require("../models/studentSchema");
 const mongoose = require("mongoose");
 
+exports.login = async (req , res) => {
+  try{
+    
+  }catch(err){
+
+  }
+}
+
+
+
 exports.allotDE = async (req, res) => {
   try {
     const courses = await courseSchema.find({});
@@ -133,7 +143,6 @@ exports.allotOE = async (req, res) => {
     }); 
   }
 };
-
 
 exports.allocateDepartmentElectives = async (req, res, next) => {
   try { 
