@@ -7,6 +7,7 @@ const {
   addCourse,
   addBranch,
   oneTime,
+  addStudentPreference,
 } = require("../controllers/updateDetails");
 const {
   allocateDepartmentElectives,
@@ -37,4 +38,5 @@ router.post('/clear-open-electives', clearOEAllottment);
 router.post('/clear-all-allottments' , clearAllotments);
 router.post('/de-allottment' , allotDE);
 router.post('/oe-allottment' , allotOE);
+router.post('/add-student-preference' , addStudentPreference);
 module.exports = router;

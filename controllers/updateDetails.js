@@ -4,6 +4,28 @@ const studentBackgroundInfo = require("../models/studentBackgroundInfo");
 const studentSchema = require("../models/studentSchema");
 const mongoose = require("mongoose");
 
+exports.addStudentPreference = async (req, res) => {
+  const { data } = req.body;
+
+  try {
+    const student = await studentSchema.findOneAndUpdate(
+      {
+        rollNo: data.rollNo,
+      },
+      data
+    );
+    return res.status(200).json({
+      success:true,
+      data:student,
+    })
+  } catch (err) {
+    return res.status(500).json({
+      success:false,
+      message: 'Internal server error while addding student',
+    })
+  }
+};
+
 exports.overWriteStudentDetails = async (req, res) => {
   const { studentDetails } = req.body;
 
@@ -258,7 +280,6 @@ exports.addStudents = async (req, res) => {
         oePreference,
         dePreference,
       }) => ({
-
         branchCode,
         gpa,
         name,
@@ -375,7 +396,7 @@ exports.addCourse = async (req, res) => {
 };
 
 function randomDE() {
-  return Math.floor(Math.random() * 3);
+  return Math.floor(Math.random() * 5) + 1;
 }
 
 exports.oneTime = async (req, res) => {
@@ -384,31 +405,31 @@ exports.oneTime = async (req, res) => {
 
     const studentData = students.map((student) => {
       const de = randomDE();
-      const oe = 2 - de;
+      const oe = 5 - de;
       return {
         branchCode: student.branchCode,
         gpa: student.gpa,
         name: student.name,
-        rollNo: student.rollNo,
-        semester: 7,
+        rollNo: student.rollNo + 400,
+        semester: 8,
         de,
         oe,
       };
     });
-    await studentSchema.deleteMany({});
+    // await studentBackgroundInfo.deleteMany({});
 
     await studentBackgroundInfo.insertMany(studentData);
 
     return res.status(200).json({
-      success:true,
+      success: true,
       studentData,
-      message:'Students Data Uploaded Successfully',
+      message: "Students Data Uploaded Successfully",
     });
   } catch (err) {
     console.log(err);
     return restatus(500).json({
-      success:false,
-      message: 'Error occured while uploading student data'
-    })
+      success: false,
+      message: "Error occured while uploading student data",
+    });
   }
 };
