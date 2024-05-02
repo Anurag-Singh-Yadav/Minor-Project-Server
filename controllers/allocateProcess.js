@@ -11,7 +11,6 @@ exports.login = async (req , res) => {
 }
 
 
-
 exports.allotDE = async (req, res) => {
   try {
     const courses = await courseSchema.find({});
@@ -358,3 +357,5 @@ exports.clearAllotments = async (req, res) => {
     });
   }
 };
+
+

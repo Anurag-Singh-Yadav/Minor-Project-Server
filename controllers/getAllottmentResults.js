@@ -17,7 +17,7 @@ exports.getStudentInfo = async (req , res) => {
     return res.status(200).json({
       success:true,
       student,
-    })
+    });
 
   }catch(err){
     console.log(err);
