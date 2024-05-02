@@ -7,6 +7,7 @@ const {
   getCourseWiseAllottment,
   getAllottmentBranchWise,
   getEveryCourse,
+  getStudentInfo,
 } = require("../controllers/getAllottmentResults");
 
 router.get("/all-branches", getAllBranches);
@@ -14,6 +15,8 @@ router.get("/all-branches", getAllBranches);
 router.post("/all-courses", getAllCourses);
 
 router.get("/every-course", getEveryCourse);
+
+router.get('/student-info' , getStudentInfo);
 
 router.post("/course-wise-allottment", getCourseWiseAllottment);
 

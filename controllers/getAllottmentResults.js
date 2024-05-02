@@ -1,10 +1,32 @@
 const branchSchema = require("../models/branchSchema");
 const courseSchema = require("../models/courseSchema");
+const studentBackgroundInfo = require("../models/studentBackgroundInfo");
 const studentSchema = require("../models/studentSchema");
 
 function padNumber(num) {
   let str = num.toString();
   return str.padStart(6, "0");
+}
+
+exports.getStudentInfo = async (req , res) => {
+  try{
+    const {rollNo} = req.body;
+
+    const student = await studentBackgroundInfo.findOne({rollNo});
+
+    return res.status(200).json({
+      success:true,
+      student,
+    })
+
+  }catch(err){
+    console.log(err);
+
+    return res.status(500).json({
+      success:false,
+      message:'Error while getting student',
+    })
+  }
 }
 
 exports.getAllBranches = async (req, res) => {
